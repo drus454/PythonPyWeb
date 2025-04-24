@@ -3,7 +3,7 @@ from .views import IndexView, BlogView, AboutView, PostDetailView, \
     PersonalAccountView, LoginView, AboutServiceView, LogoutView
 from .views import EntryJson
 
-app_name = 'app'
+# app_name = 'app'
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),

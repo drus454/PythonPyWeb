@@ -1,12 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, filters
+from rest_framework import status, filters, permissions, authentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import GenericAPIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
-from django.views.decorators.csrf import csrf_exempt  # Чтобы post, put, patch, delete не требовали csrf токена (небезопасно)
+from django.views.decorators.csrf import csrf_exempt
 from apps.db_train_alternative.models import Author
 from .serializers import AuthorSerializer, AuthorModelSerializer
 from django.http import Http404
@@ -72,11 +73,30 @@ class AuthorAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class CustomPermission(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        # Разрешаем только GET запросы для неаутентифицированных пользователей
+        if request.method == 'GET' and not request.user.is_authenticated:
+            return True
+
+        # Разрешаем GET и POST запросы для аутентифицированных пользователей
+        if request.method in ['GET', 'POST'] and request.user.is_authenticated:
+            return True
+
+        # Разрешаем все действия для администраторов
+        if request.user.is_superuser:
+            return True
+
+        # Во всех остальных случаях возвращаем False
+        return False
+
 class AuthorGenericAPIView(GenericAPIView, RetrieveModelMixin, ListModelMixin, CreateModelMixin, UpdateModelMixin,
                            DestroyModelMixin):
     queryset = Author.objects.all()
     serializer_class = AuthorModelSerializer
-
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
     def get(self, request, *args, **kwargs):
         if kwargs.get(self.lookup_field):
             try:
@@ -111,6 +131,7 @@ class AuthorViewSet(ModelViewSet):
     filterset_fields = ['name', 'email']
     search_fields = ['email']
     ordering_fields = ['name', 'email']
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -122,4 +143,6 @@ class AuthorViewSet(ModelViewSet):
     @action(detail=True, methods=['post'])
     def my_action(self, request, pk=None):
         return Response({'message': f'Пользовательская функция для пользователя с pk={pk}'})
+
+
 
