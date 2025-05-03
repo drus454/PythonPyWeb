@@ -138,4 +138,30 @@ if __name__ == "__main__":
     # )
     # print(calc_rating)
 
+    # filtered_data = Blog.objects.filter(id__gte=2)
+    # print(filtered_data)
+    # print(filtered_data.reverse())
+
+    # print(Entry.objects.order_by('author', 'pub_date').distinct('author', 'pub_date'))
+
+    # print(Blog.objects.filter(name__startswith='Фитнес'))
+    # print(Blog.objects.filter(name__startswith = 'Фитнес').values())
+    # print(Blog.objects.values('id', 'name'))
+
+    # print(Blog.objects.values_list())
+    # print(Blog.objects.values_list('id', 'name'))
+
+    # blog_a_entries = Entry.objects.filter(blog__name='Путешествия по миру')
+    # blog_b_entries = Entry.objects.filter(blog__name='Кулинарные искушения')
+    # blog_c_entries = Entry.objects.filter(blog__name='Фитнес и здоровый образ жизни')
+    # result_qs = blog_a_entries.union(blog_b_entries, blog_c_entries)
+    # print(result_qs)
+
+    # print(Entry.objects.filter(blog__name__in=['Путешествия по миру', 'Кулинарные искушения', 'Фитнес и здоровый образ жизни']))
+
+    # blog_a_entries = Entry.objects.filter(blog__name='Путешествия по миру').values('author')
+    # blog_b_entries = Entry.objects.filter(blog__name='Кулинарные искушения').values('author')
+    # blog_c_entries = Entry.objects.filter(blog__name='Фитнес и здоровый образ жизни').values('author')
+    # result_qs = Entry.objects.values('author').difference(blog_a_entries, blog_b_entries, blog_c_entries)
+    # print(result_qs)
 
